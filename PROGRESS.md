@@ -215,7 +215,7 @@ services.AddSingleton<IPrintService, PrintService>();
 
 ---
 
-## 🔄 Fase 3 (En Progreso): ViewModels
+## ✅ Fase 3 Completada: ViewModels + Servicios de Infraestructura
 
 ### **ViewModels Creados** (`KeepPrinter.ViewModels/`)
 
@@ -223,14 +223,16 @@ services.AddSingleton<IPrintService, PrintService>();
 - Gestión de navegación entre vistas
 - Mantiene `PrintSession` en memoria (in-memory, sin persistencia)
 - Comandos: `NavigateToSetup`, `NavigateToBatchProgress`, `NavigateToCompletion`, `Restart`
+- ✅ Métodos públicos expuestos para navegación desde otros ViewModels
 
 #### ✅ **SetupViewModel**  
 - Configuración inicial de sesión
-- File picker para seleccionar PDF
+- File picker para seleccionar PDF (usando `IWindowService`)
 - Folder picker para carpeta de salida
 - Análisis de PDF (conteo de páginas)
 - Generación de tandas
-- Validación de parámetros
+- Validación de parámetros con `PrintSessionValidator.ValidateInitialParameters`
+- ✅ Usa `WorkflowStage.Prepared` correctamente
 
 #### ✅ **BatchProgressViewModel**
 - Manejo de impresión de tandas
@@ -238,16 +240,55 @@ services.AddSingleton<IPrintService, PrintService>();
 - Comandos: `PrintFront`, `PrintBack`, `ConfirmBatchComplete`
 - Navegación entre tandas
 - Apertura de carpeta de salida
+- ✅ Usa `WorkflowStage.Prepared` y `WorkflowStage.BatchComplete` correctamente
 
 #### ✅ **CompletionViewModel**
 - Pantalla de finalización
 - Resumen de sesión (páginas, tandas, duración)
 - Comandos: `OpenOutputFolder`, `StartNewSession`, `ExitApplication`
+- ✅ Usa `IApplicationService` para cerrar la aplicación
+
+### **Servicios de Infraestructura Creados:**
+
+#### ✅ **IWindowService / WindowService**
+**Ubicación:** `Core/Services/IWindowService.cs`, `App/Services/WindowService.cs`
+- Abstrae acceso a ventana principal
+- `GetMainWindowHandle()` retorna `nint` (handle nativo)
+- Permite a ViewModels usar WinRT pickers sin referenciar `App` directamente
+
+#### ✅ **IApplicationService / ApplicationService**
+**Ubicación:** `Core/Services/IApplicationService.cs`, `App/Services/ApplicationService.cs`
+- Abstrae operaciones de aplicación
+- `Exit()` cierra la aplicación
+- Desacopla ViewModels de implementación WinUI 3
+
+### **Correcciones Realizadas:**
+- ✅ `PrintSession.Id` (no `SessionId`)
+- ✅ `PrintSessionValidator.ValidateInitialParameters()` (no `ValidateSessionParameters`)
+- ✅ `WorkflowStage.Prepared` (no `Ready`)
+- ✅ `WorkflowStage.BatchComplete` (no `Completed` ni `BatchCompleted`)
+- ✅ Métodos públicos en `MainViewModel`: `NavigateToCompletion()`, `Restart()`
+- ✅ Servicios abstractos para acceso a ventana y aplicación
 
 ### **Dependencias Agregadas:**
-- ✅ `CommunityToolkit.Mvvm 8.4.0` - MVVM helpers
+- ✅ `CommunityToolkit.Mvvm 8.4.0` - MVVM helpers con source generators
 - ✅ Referencia a `KeepPrinter.Infrastructure` en ViewModels
 - ✅ TargetFramework actualizado a `net8.0-windows10.0.19041.0` + `UseWinRT`
+
+### **Estado de Compilación:**
+- ✅ `dotnet build` - Compilación exitosa sin errores
+- ✅ `dotnet test` - 62/62 tests pasando
+- ✅ Sin warnings críticos
+
+### **Documentación Generada:**
+- ✅ `VIEWMODELS_PENDING_FIXES.md` - Errores identificados y soluciones
+- ✅ `VIEWMODELS_CORRECCIONES_COMPLETADAS.md` - Reporte completo de correcciones
+- ✅ `PERSISTENCIA_ESTRATEGIA.md` - Análisis de estrategia de persistencia (decisión: in-memory)
+- ✅ `FASE_2_PRINTSERVICE_NATIVO.md` - Documentación de refactor a printing nativo
+
+---
+
+## 🔄 Fase 4 (Siguiente): Páginas XAML + Configuración DI
 
 ### **Estado:**
 - ⚠️ ViewModels creados pero con errores de compilación menores

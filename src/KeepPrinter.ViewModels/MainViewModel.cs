@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KeepPrinter.Core.Models;
 using KeepPrinter.Core.Contracts;
+using KeepPrinter.Core.Services;
 
 namespace KeepPrinter.ViewModels;
 
@@ -12,6 +13,8 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly IPdfService _pdfService;
     private readonly IPrintService _printService;
+    private readonly IWindowService _windowService;
+    private readonly IApplicationService _applicationService;
 
     [ObservableProperty]
     private PrintSession? _currentSession;
@@ -24,10 +27,14 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel(
         IPdfService pdfService,
-        IPrintService printService)
+        IPrintService printService,
+        IWindowService windowService,
+        IApplicationService applicationService)
     {
         _pdfService = pdfService;
         _printService = printService;
+        _windowService = windowService;
+        _applicationService = applicationService;
 
         // Iniciar en vista de configuración
         NavigateToSetup();
@@ -40,7 +47,7 @@ public partial class MainViewModel : ObservableObject
     private void NavigateToSetup()
     {
         CurrentViewName = "Setup";
-        CurrentView = new SetupViewModel(_pdfService, this);
+        CurrentView = new SetupViewModel(_pdfService, _windowService, this);
     }
 
     /// <summary>
@@ -62,10 +69,10 @@ public partial class MainViewModel : ObservableObject
     /// Navega a la vista de finalización.
     /// </summary>
     [RelayCommand]
-    private void NavigateToCompletion()
+    public void NavigateToCompletion()
     {
         CurrentViewName = "Completion";
-        CurrentView = new CompletionViewModel(CurrentSession, this);
+        CurrentView = new CompletionViewModel(CurrentSession, this, _applicationService);
     }
 
     /// <summary>
@@ -81,7 +88,7 @@ public partial class MainViewModel : ObservableObject
     /// Reinicia la aplicación (nueva sesión).
     /// </summary>
     [RelayCommand]
-    private void Restart()
+    public void Restart()
     {
         CurrentSession = null;
         NavigateToSetup();

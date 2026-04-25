@@ -15,6 +15,7 @@ namespace KeepPrinter.ViewModels;
 public partial class SetupViewModel : ObservableObject
 {
     private readonly IPdfService _pdfService;
+    private readonly IWindowService _windowService;
     private readonly MainViewModel _mainViewModel;
 
     [ObservableProperty]
@@ -43,9 +44,11 @@ public partial class SetupViewModel : ObservableObject
 
     public SetupViewModel(
         IPdfService pdfService,
+        IWindowService windowService,
         MainViewModel mainViewModel)
     {
         _pdfService = pdfService;
+        _windowService = windowService;
         _mainViewModel = mainViewModel;
     }
 
@@ -65,7 +68,7 @@ public partial class SetupViewModel : ObservableObject
             picker.FileTypeFilter.Add(".pdf");
 
             // Obtener la ventana actual para el picker
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            var hwnd = _windowService.GetMainWindowHandle();
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             var file = await picker.PickSingleFileAsync();
@@ -134,7 +137,7 @@ public partial class SetupViewModel : ObservableObject
             };
             picker.FileTypeFilter.Add("*");
 
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            var hwnd = _windowService.GetMainWindowHandle();
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             var folder = await picker.PickSingleFolderAsync();
@@ -178,7 +181,7 @@ public partial class SetupViewModel : ObservableObject
             // Crear sesión
             var session = new PrintSession
             {
-                SessionId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 SourcePdfPath = SelectedPdfPath,
                 OutputFolder = OutputFolder,
                 StartPage = StartPage,
@@ -189,17 +192,7 @@ public partial class SetupViewModel : ObservableObject
             };
 
             // Validar parámetros
-            var validation = PrintSessionValidator.ValidateSessionParameters(
-                session.SourcePdfPath,
-                session.StartPage,
-                session.TotalPages,
-                session.SheetsPerBatch);
-
-            if (!validation.IsValid)
-            {
-                ErrorMessage = string.Join("\n", validation.Errors);
-                return;
-            }
+            PrintSessionValidator.ValidateInitialParameters(session);
 
             // Calcular tandas
             StatusMessage = "Calculando tandas...";
@@ -214,7 +207,7 @@ public partial class SetupViewModel : ObservableObject
                 await _pdfService.GenerateBatchPdfsAsync(session, batch);
             }
 
-            session.CurrentStage = WorkflowStage.Ready;
+            session.CurrentStage = WorkflowStage.Prepared;
 
             StatusMessage = "¡Sesión lista para imprimir!";
 

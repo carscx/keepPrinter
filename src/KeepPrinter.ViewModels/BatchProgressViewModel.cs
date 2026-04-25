@@ -108,7 +108,7 @@ public partial class BatchProgressViewModel : ObservableObject
             _session.LastModifiedAt = DateTime.Now;
 
             // Actualizar etapa
-            if (_session.CurrentStage == WorkflowStage.Ready)
+            if (_session.CurrentStage == WorkflowStage.Prepared)
             {
                 _session.CurrentStage = WorkflowStage.PendingBack;
             }
@@ -184,14 +184,14 @@ public partial class BatchProgressViewModel : ObservableObject
         }
 
         CurrentBatch.IsComplete = true;
-        _session.CurrentStage = WorkflowStage.BatchCompleted;
+        _session.CurrentStage = WorkflowStage.BatchComplete;
         _session.LastModifiedAt = DateTime.Now;
 
         // Avanzar a siguiente tanda
         if (_session.HasMoreBatches)
         {
             _session.CurrentBatchIndex++;
-            _session.CurrentStage = WorkflowStage.Ready;
+            _session.CurrentStage = WorkflowStage.Prepared;
 
             CurrentBatch = _session.CurrentBatch;
             CurrentBatchNumber = _session.CurrentBatchIndex + 1;

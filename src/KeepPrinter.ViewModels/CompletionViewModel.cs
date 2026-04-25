@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KeepPrinter.Core.Models;
+using KeepPrinter.Core.Services;
 
 namespace KeepPrinter.ViewModels;
 
@@ -11,13 +12,16 @@ public partial class CompletionViewModel : ObservableObject
 {
     private readonly PrintSession? _session;
     private readonly MainViewModel _mainViewModel;
+    private readonly IApplicationService _applicationService;
 
     public CompletionViewModel(
         PrintSession? session,
-        MainViewModel mainViewModel)
+        MainViewModel mainViewModel,
+        IApplicationService applicationService)
     {
         _session = session;
         _mainViewModel = mainViewModel;
+        _applicationService = applicationService;
     }
 
     /// <summary>
@@ -73,6 +77,6 @@ public partial class CompletionViewModel : ObservableObject
     [RelayCommand]
     private void ExitApplication()
     {
-        App.Current.Exit();
+        _applicationService.Exit();
     }
 }
