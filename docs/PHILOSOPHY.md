@@ -17,8 +17,8 @@ Si el documento tiene cientos de páginas, se trabaja por **tandas** (por ejempl
 - La aplicación debe recordar (en disco o en sesión clara) al menos:
   - documento de trabajo (ruta o identificador),
   - parámetros de tanda (página inicial, hojas por tanda),
-  - **índice de tanda actual** y **fase** (frente impreso / pendiente dorso / tanda confirmada).
-- Tras un error, el usuario debe poder decir: *“sigo en la tanda 3, me falta el dorso”* sin reprocesar todo.
+  - **índice de tanda actual y pagina actual** y **fase** (frente impreso / pendiente dorso / tanda confirmada).
+- Tras un error, el usuario debe poder decir: *“sigo en la tanda 3 pagina 5, me falta el dorso”* sin reprocesar todo.
 
 ### 2. Tandas como unidad de trabajo
 
