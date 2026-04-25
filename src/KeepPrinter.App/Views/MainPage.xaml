@@ -1,0 +1,67 @@
+<Page
+    x:Class="KeepPrinter.App.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:KeepPrinter.ViewModels"
+    xmlns:views="using:KeepPrinter.App.Views"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <!-- DataTemplates para mapeo ViewModel → View -->
+        <DataTemplate x:Key="SetupTemplate" x:DataType="vm:SetupViewModel">
+            <views:SetupPage DataContext="{Binding}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="BatchProgressTemplate" x:DataType="vm:BatchProgressViewModel">
+            <views:BatchProgressPage DataContext="{Binding}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CompletionTemplate" x:DataType="vm:CompletionViewModel">
+            <views:CompletionPage DataContext="{Binding}"/>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <!-- Header con branding -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border 
+            Grid.Row="0"
+            Background="#2A2A72"
+            Padding="24,16">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <FontIcon 
+                    Glyph="&#xE8F7;" 
+                    FontSize="24"
+                    Foreground="White"/>
+                <TextBlock 
+                    Text="Bunker Print Master" 
+                    FontSize="20"
+                    FontWeight="SemiBold"
+                    Foreground="White"
+                    VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ContentControl con navegación -->
+        <ContentControl 
+            Grid.Row="1"
+            Content="{x:Bind ViewModel.CurrentView, Mode=OneWay}"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch">
+            <ContentControl.ContentTemplateSelector>
+                <views:ViewModelTemplateSelector 
+                    SetupTemplate="{StaticResource SetupTemplate}"
+                    BatchProgressTemplate="{StaticResource BatchProgressTemplate}"
+                    CompletionTemplate="{StaticResource CompletionTemplate}"/>
+            </ContentControl.ContentTemplateSelector>
+        </ContentControl>
+    </Grid>
+</Page>

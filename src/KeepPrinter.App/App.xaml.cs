@@ -1,64 +1,61 @@
-using Microsoft.UI.Xaml;
 using System;
-using System.IO;
+using Microsoft.UI.Xaml;
+using Microsoft.Extensions.DependencyInjection;
+using KeepPrinter.Core.Contracts;
+using KeepPrinter.Core.Services;
+using KeepPrinter.Infrastructure.Services;
+using KeepPrinter.ViewModels;
+using KeepPrinter.App.Services;
+using KeepPrinter.App.Views;
 
 namespace KeepPrinter.App;
 
 public partial class App : Application
 {
-    private static readonly string LogPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.Desktop), 
-        "KeepPrinter_Log.txt");
+    private Window? m_window;
+    private IServiceProvider? _serviceProvider;
 
     public App()
     {
-        WriteLog("=== App Constructor Started ===");
-        try
-        {
-            WriteLog("Calling InitializeComponent...");
-            InitializeComponent();
-            WriteLog("InitializeComponent completed successfully");
-        }
-        catch (Exception ex)
-        {
-            WriteLog($"ERROR in Constructor: {ex.Message}");
-            WriteLog($"Stack: {ex.StackTrace}");
-            throw;
-        }
+        InitializeComponent();
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        WriteLog("=== OnLaunched Started ===");
-        try
-        {
-            WriteLog("Creating MainWindow...");
-            m_window = new MainWindow();
-            WriteLog("MainWindow created successfully");
+        // Crear ventana principal
+        m_window = new MainWindow();
 
-            WriteLog("Activating window...");
-            m_window.Activate();
-            WriteLog("Window activated successfully");
-        }
-        catch (Exception ex)
-        {
-            WriteLog($"ERROR in OnLaunched: {ex.Message}");
-            WriteLog($"Stack: {ex.StackTrace}");
-            throw;
-        }
+        // Configurar DI
+        var services = new ServiceCollection();
+        ConfigureServices(services);
+        _serviceProvider = services.BuildServiceProvider();
+
+        // Crear MainPage y asignar ViewModel
+        var mainPage = new MainPage();
+        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+        mainPage.DataContext = mainViewModel;
+
+        // Asignar contenido a la ventana
+        m_window.Content = mainPage;
+
+        // Activar ventana
+        m_window.Activate();
     }
 
-    private Window? m_window;
-
-    private static void WriteLog(string message)
+    private void ConfigureServices(IServiceCollection services)
     {
-        try
-        {
-            File.AppendAllText(LogPath, $"[{DateTime.Now:HH:mm:ss.fff}] {message}\n");
-        }
-        catch
-        {
-            // Si no se puede escribir el log, ignorar silenciosamente
-        }
+        // Servicios de infraestructura
+        services.AddSingleton<IPdfService, PdfService>();
+        services.AddSingleton<IPrintService, PrintService>();
+
+        // Servicios de aplicación
+        services.AddSingleton<IWindowService>(sp => new WindowService(m_window!));
+        services.AddSingleton<IApplicationService, ApplicationService>();
+
+        // ViewModels
+        services.AddSingleton<MainViewModel>();
+        services.AddTransient<SetupViewModel>();
+        services.AddTransient<BatchProgressViewModel>();
+        services.AddTransient<CompletionViewModel>();
     }
 }

@@ -1,0 +1,184 @@
+<Page
+    x:Class="KeepPrinter.App.Views.SetupPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:KeepPrinter.App.Converters"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+        <converters:StringToBoolConverter x:Key="StringToBoolConverter"/>
+        <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="800" Padding="40" Spacing="24">
+
+            <!-- Encabezado -->
+            <StackPanel Spacing="8">
+                <TextBlock 
+                    Text="Configuración de Impresión" 
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Foreground="#2A2A72"/>
+                <TextBlock 
+                    Text="Configure los parámetros para imprimir su documento en tandas"
+                    Style="{StaticResource BodyTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+
+            <!-- Selección de PDF -->
+            <StackPanel Spacing="12">
+                <TextBlock 
+                    Text="1. Archivo PDF" 
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Foreground="#2A2A72"
+                    FontWeight="SemiBold"/>
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox 
+                        Text="{x:Bind ViewModel.SelectedPdfPath, Mode=OneWay}"
+                        PlaceholderText="Seleccione un archivo PDF..."
+                        IsReadOnly="True"
+                        Grid.Column="0"/>
+
+                    <Button 
+                        Content="Seleccionar PDF"
+                        Command="{x:Bind ViewModel.SelectPdfCommand}"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Grid.Column="1"/>
+                </Grid>
+
+                <!-- Mensaje de páginas detectadas -->
+                <TextBlock 
+                    Visibility="{x:Bind ViewModel.TotalPages, Mode=OneWay, Converter={StaticResource IntToVisibilityConverter}}"
+                    Foreground="#4CAF50"
+                    FontWeight="SemiBold">
+                    <Run Text="✓ "/>
+                    <Run Text="{x:Bind ViewModel.TotalPages, Mode=OneWay}"/>
+                    <Run Text=" páginas detectadas"/>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- Configuración de páginas -->
+            <StackPanel 
+                Spacing="12"
+                Visibility="{x:Bind ViewModel.TotalPages, Mode=OneWay, Converter={StaticResource IntToVisibilityConverter}}">
+
+                <TextBlock 
+                    Text="2. Configuración de Páginas" 
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Foreground="#2A2A72"
+                    FontWeight="SemiBold"/>
+
+                <Grid ColumnSpacing="16" RowSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="Página inicial" FontWeight="SemiBold"/>
+                        <NumberBox 
+                            Value="{x:Bind ViewModel.StartPage, Mode=TwoWay}"
+                            Minimum="1"
+                            Maximum="{x:Bind ViewModel.TotalPages, Mode=OneWay}"
+                            SpinButtonPlacementMode="Inline"
+                            SmallChange="1"
+                            LargeChange="10"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <TextBlock Text="Hojas por tanda" FontWeight="SemiBold"/>
+                        <NumberBox 
+                            Value="{x:Bind ViewModel.SheetsPerBatch, Mode=TwoWay}"
+                            Minimum="1"
+                            Maximum="1000"
+                            SpinButtonPlacementMode="Inline"
+                            SmallChange="5"
+                            LargeChange="25"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- Carpeta de salida -->
+            <StackPanel 
+                Spacing="12"
+                Visibility="{x:Bind ViewModel.TotalPages, Mode=OneWay, Converter={StaticResource IntToVisibilityConverter}}">
+
+                <TextBlock 
+                    Text="3. Carpeta de Salida" 
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Foreground="#2A2A72"
+                    FontWeight="SemiBold"/>
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox 
+                        Text="{x:Bind ViewModel.OutputFolder, Mode=TwoWay}"
+                        PlaceholderText="Carpeta donde se guardarán los PDFs de tandas"
+                        Grid.Column="0"/>
+
+                    <Button 
+                        Content="Cambiar"
+                        Command="{x:Bind ViewModel.SelectOutputFolderCommand}"
+                        Grid.Column="1"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- Mensajes de estado/error -->
+            <InfoBar 
+                IsOpen="{x:Bind ViewModel.ErrorMessage, Mode=OneWay, Converter={StaticResource StringToBoolConverter}}"
+                Severity="Error"
+                Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+                IsClosable="True"/>
+
+            <InfoBar 
+                IsOpen="{x:Bind ViewModel.StatusMessage, Mode=OneWay, Converter={StaticResource StringToBoolConverter}}"
+                Severity="Informational"
+                Message="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                IsClosable="False"/>
+
+            <!-- Botón iniciar -->
+            <StackPanel
+                Spacing="12"
+                Visibility="{x:Bind ViewModel.TotalPages, Mode=OneWay, Converter={StaticResource IntToVisibilityConverter}}">
+
+                <Button 
+                    Command="{x:Bind ViewModel.StartSessionCommand}"
+                    IsEnabled="{x:Bind ViewModel.IsProcessing, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}"
+                    Style="{StaticResource AccentButtonStyle}"
+                    HorizontalAlignment="Stretch"
+                    Height="48">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ProgressRing 
+                            IsActive="{x:Bind ViewModel.IsProcessing, Mode=OneWay}"
+                            Width="20" 
+                            Height="20"
+                            Visibility="{x:Bind ViewModel.IsProcessing, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <TextBlock 
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            FontWeight="SemiBold">
+                            <Run Text="{x:Bind ViewModel.IsProcessing, Mode=OneWay}"/>
+                            <Run x:Name="ButtonText" Text="Generar Tandas e Iniciar"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>
