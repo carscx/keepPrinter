@@ -126,23 +126,30 @@ Implementación completa usando **PdfSharp 6.2.4**:
 - ✅ Operaciones asíncronas con CancellationToken
 
 #### ✅ **PrintService** (`KeepPrinter.Infrastructure/Services/PrintService.cs`)
-Implementación completa usando APIs de Windows + SumatraPDF:
+**Implementación 100% nativa** usando APIs de Windows (sin dependencias externas):
 
 ##### Métodos implementados:
 - ✅ `GetAvailablePrintersAsync()` - Enumera impresoras instaladas con estado
 - ✅ `GetDefaultPrinterAsync()` - Obtiene impresora predeterminada del sistema
-- ✅ `PrintPdfAsync(pdfPath, printerName)` - Imprime PDF en impresora específica
+- ✅ `PrintPdfAsync(pdfPath, printerName)` - Imprime PDF con renderizado nativo
 
 ##### Características:
-- ✅ Enumeración de impresoras con `System.Drawing.Printing`
-- ✅ Impresión silenciosa vía **SumatraPDF** (método preferido)
-- ✅ Fallback a Windows Shell "print" verb si SumatraPDF no está disponible
+- ✅ **Renderizado nativo** con `Windows.Data.Pdf` (WinRT)
+- ✅ **Conversión a bitmap** con `Windows.Graphics.Imaging`
+- ✅ **Impresión directa** con `System.Drawing.Printing.PrintDocument`
+- ✅ **Cero dependencias externas** - No requiere SumatraPDF ni otros ejecutables
+- ✅ **300 DPI** - Calidad profesional de impresión
+- ✅ **Escalado automático** al área imprimible con centrado
 - ✅ Validación de impresora disponible antes de imprimir
-- ✅ Búsqueda inteligente de SumatraPDF.exe (carpeta Tools/)
 - ✅ Manejo de CancellationToken
+- ✅ Limpieza automática de recursos (Dispose)
 
-##### Documentación:
-- ✅ `docs/PRINTSERVICE_SETUP.md` - Guía de instalación de SumatraPDF
+##### Stack Tecnológico:
+- `net8.0-windows10.0.19041.0` con `<UseWinRT>true</UseWinRT>`
+- `Windows.Data.Pdf` - Cargar y renderizar PDFs
+- `Windows.Graphics.Imaging` - Conversión de imágenes
+- `System.Drawing.Printing` - Envío a impresora
+- `System.Drawing.Common` - Manejo de bitmaps
 
 #### ✅ **Tests de Infrastructure** (`KeepPrinter.Infrastructure.Tests`)
 
