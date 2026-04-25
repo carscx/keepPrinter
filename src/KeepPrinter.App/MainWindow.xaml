@@ -86,9 +86,10 @@
                             <TextBlock Text="✅ Validación de parámetros"/>
                             <TextBlock Text="✅ Cálculo de tandas (frente/dorso)"/>
                             <TextBlock Text="✅ Servicio PDF (contar, extraer, generar tandas)"/>
-                            <TextBlock Text="✅ Servicio de impresión (enumerar, SumatraPDF)"/>
+                            <TextBlock Text="✅ Servicio de impresión NATIVA (300 DPI, sin dependencias)"/>
                             <TextBlock Text="✅ Arquitectura MVVM preparada"/>
                             <TextBlock Text="✅ Inyección de dependencias"/>
+                            <TextBlock Text="⚠️ Persistencia (pendiente de diseñar)"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -100,10 +101,46 @@
                             CornerRadius="8" Padding="16" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
                             BorderThickness="1">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="1. SessionStore - Persistencia y reanudación"/>
+                            <TextBlock Text="1. Diseñar estrategia de persistencia (¿SessionStore o in-memory?)"/>
                             <TextBlock Text="2. ViewModels - Lógica de presentación"/>
                             <TextBlock Text="3. UI completa - Diseño documentado en docs/UI_DESIGN.md"/>
                             <TextBlock Text="4. Empaquetado MSIX"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Estrategia de Persistencia -->
+                <StackPanel Spacing="12">
+                    <TextBlock Text="💭 Estrategia de Persistencia (Análisis)" FontSize="20" FontWeight="SemiBold"/>
+                    <Border Background="#FFF4E5" CornerRadius="8" Padding="16" BorderBrush="#FFA726" BorderThickness="2">
+                        <StackPanel Spacing="12">
+                            <TextBlock FontWeight="SemiBold" Foreground="#E65100">
+                                🤔 Pregunta Clave: ¿Qué pasa si el usuario cierra la app?
+                            </TextBlock>
+
+                            <TextBlock Text="Opción 1: SessionStore (JSON en disco)" FontWeight="SemiBold" Foreground="#1976D2"/>
+                            <StackPanel Spacing="4" Margin="16,0,0,0">
+                                <TextBlock Text="✅ Pros: Reanudación después de cerrar app, historial de sesiones"/>
+                                <TextBlock Text="❌ Contras: Complejidad, posible desincronización (PDFs generados vs estado guardado)"/>
+                            </StackPanel>
+
+                            <TextBlock Text="Opción 2: In-Memory (solo mientras app está abierta)" FontWeight="SemiBold" Foreground="#1976D2" Margin="0,8,0,0"/>
+                            <StackPanel Spacing="4" Margin="16,0,0,0">
+                                <TextBlock Text="✅ Pros: Simple, siempre sincronizado, sin archivos huérfanos"/>
+                                <TextBlock Text="❌ Contras: Perder progreso al cerrar (pero ¿es realmente un problema?)"/>
+                            </StackPanel>
+
+                            <TextBlock Text="Opción 3: Híbrido (guardar solo al usuario solicitarlo)" FontWeight="SemiBold" Foreground="#1976D2" Margin="0,8,0,0"/>
+                            <StackPanel Spacing="4" Margin="16,0,0,0">
+                                <TextBlock Text="✅ Pros: Balance entre simplicidad y seguridad"/>
+                                <TextBlock Text="💡 Idea: Botón 'Guardar Progreso' explícito"/>
+                            </StackPanel>
+
+                            <TextBlock Text="🎯 Recomendación: Opción 2 (In-Memory) para MVP" FontWeight="SemiBold" Foreground="#2E7D32" Margin="0,12,0,0"/>
+                            <TextBlock TextWrapping="Wrap" Foreground="#424242">
+                                Razón: La mayoría de usuarios imprimirán todo el documento de una vez. 
+                                Si necesitan pausar, pueden cerrar la tanda actual y empezar desde ahí más tarde (los PDFs ya están generados).
+                            </TextBlock>
                         </StackPanel>
                     </Border>
                 </StackPanel>
