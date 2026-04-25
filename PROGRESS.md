@@ -215,9 +215,76 @@ services.AddSingleton<IPrintService, PrintService>();
 
 ---
 
+## 🔄 Fase 3 (En Progreso): ViewModels
+
+### **ViewModels Creados** (`KeepPrinter.ViewModels/`)
+
+#### ✅ **MainViewModel**
+- Gestión de navegación entre vistas
+- Mantiene `PrintSession` en memoria (in-memory, sin persistencia)
+- Comandos: `NavigateToSetup`, `NavigateToBatchProgress`, `NavigateToCompletion`, `Restart`
+
+#### ✅ **SetupViewModel**  
+- Configuración inicial de sesión
+- File picker para seleccionar PDF
+- Folder picker para carpeta de salida
+- Análisis de PDF (conteo de páginas)
+- Generación de tandas
+- Validación de parámetros
+
+#### ✅ **BatchProgressViewModel**
+- Manejo de impresión de tandas
+- Carga de impresoras disponibles
+- Comandos: `PrintFront`, `PrintBack`, `ConfirmBatchComplete`
+- Navegación entre tandas
+- Apertura de carpeta de salida
+
+#### ✅ **CompletionViewModel**
+- Pantalla de finalización
+- Resumen de sesión (páginas, tandas, duración)
+- Comandos: `OpenOutputFolder`, `StartNewSession`, `ExitApplication`
+
+### **Dependencias Agregadas:**
+- ✅ `CommunityToolkit.Mvvm 8.4.0` - MVVM helpers
+- ✅ Referencia a `KeepPrinter.Infrastructure` en ViewModels
+- ✅ TargetFramework actualizado a `net8.0-windows10.0.19041.0` + `UseWinRT`
+
+### **Estado:**
+- ⚠️ ViewModels creados pero con errores de compilación menores
+- ⚠️ Requiere correcciones (15-20 min):
+  - Cambiar `SessionId` → `Id`
+  - Cambiar `WorkflowStage.Ready` → `WorkflowStage.Prepared`
+  - Cambiar `WorkflowStage.BatchCompleted` → `WorkflowStage.Completed`
+  - Hacer públicos algunos métodos de MainViewModel
+  - Resolver referencias a `App.MainWindow`
+
+**Ver:** `VIEWMODELS_PENDING_FIXES.md` para lista completa de correcciones.
+
+---
+
 ## 📋 Próximos Pasos
 
-### **Fase 2 (Continuación): SessionStore**
+### **Fase 3 (Continuación): UI Completa** (4-5 horas)
+
+1. **Corregir ViewModels** (15-20 min)
+   - Aplicar correcciones documentadas
+   - Verificar compilación exitosa
+
+2. **Crear Páginas XAML** (2-3 horas)
+   - SetupPage (configuración inicial)
+   - BatchProgressPage (impresión de tandas)
+   - CompletionPage (resumen)
+   - MainPage (navegación)
+
+3. **Configurar DI** (30 min)
+   - Registrar ViewModels en App.xaml.cs
+   - Configurar navegación
+
+4. **Testing End-to-End** (1 hora)
+   - Probar flujo completo
+   - Ajustes de UX
+
+### **Fase 2 (Opcional): SessionStore**
 
 Implementar en `KeepPrinter.Infrastructure/`:
 
